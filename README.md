@@ -1,11 +1,30 @@
 # refs
 Reference Lookup Golang Package
 
+`refs` adalah package utilitas berbahasa Go (Golang) yang dirancang untuk memudahkan developer dalam mencari dan mengekstrak metadata dari berbagai pustaka penyedia referensi akademik.
+
+## Instalasi
+Gunakan perintah berikut untuk mengunduh package:
+```bash
+go get github.com/ifcoid/refs@latest
+```
+
 ## Fitur & Penggunaan
 
-Package ini menyediakan fungsi untuk mengambil referensi dan sitasi dari berbagai sumber penyedia pustaka akademik secara langsung.
+### 1. Ekstraksi Artikel via Scopus API
+Anda dapat melakukan pencarian berdasar kata kunci dan langsung menarik _Full-Text_ dari database Scopus Elsevier.
 
-### 1. Ekstraksi via doi.org (Content Negotiation)
+```go
+import "github.com/ifcoid/refs"
+
+// Melakukan pencarian menggunakan API Key Scopus
+searchResult, err := refs.SearchScopusArticles("machine learning", "SCOPUS_API_KEY_ANDA")
+
+// Mengambil detail metadata dan Full Text (bila Open Access)
+fullText, err := refs.RetrieveFullText("10.1109/OJCOMS.2026.3666740", "SCOPUS_API_KEY_ANDA")
+```
+
+### 2. Ekstraksi Sitasi via doi.org (Content Negotiation)
 Metode ini sangat fleksibel untuk mendapatkan sitasi dalam berbagai *format standar* tanpa parsing manual.
 
 ```go
@@ -21,26 +40,37 @@ bibtex, err := refs.GetDOIBibTeX("10.1109/OJCOMS.2026.3666740")
 citation, err := refs.GetDOICitationText("10.1109/OJCOMS.2026.3666740", "apa", "en-US")
 ```
 
-### 2. Ekstraksi Terstruktur via Crossref API
-Metode ini berguna jika Anda ingin *programmability* lebih mendalam di Go. Data ditarik dari API resmi Crossref dan langsung di-unmarshal ke dalam *Struct Golang* (`*CrossrefWork`).
+### 3. Ekstraksi Profil Lengkap via Crossref API
+Kini tersedia beragam fungsi *endpoint* tambahan dari Crossref yang memudahkan Anda mengekstrak profil entitas akademik dan memetakan responnya (Unmarshal) secara otomatis ke **Struct Go**.
 
 ```go
-import (
-    "fmt"
-    "github.com/ifcoid/refs"
-)
+import "github.com/ifcoid/refs"
 
-crossrefData, err := refs.GetCrossrefWork("10.1109/OJCOMS.2026.3666740")
-if err == nil && crossrefData != nil {
-    fmt.Println("Judul Artikel:", crossrefData.Title[0])
-    fmt.Println("Penerbit:", crossrefData.Publisher)
-    fmt.Println("Penulis Utama:", crossrefData.Author[0].Given, crossrefData.Author[0].Family)
-}
+// 1. Mencari Jurnal berdasarkan ISSN
+journal, _ := refs.GetCrossrefJournal("2644-125X")
+
+// 2. Mencari Profil Institusi / Funder
+funder, _ := refs.GetCrossrefFunder("100000001")
+member, _ := refs.GetCrossrefMember("98")
+
+// 3. Melihat kamus tipe dan lisensi
+types, _ := refs.GetCrossrefTypes()
+licenses, _ := refs.GetCrossrefLicenses()
+
+// 4. Pencarian Artikel Bebas
+// (Parameter: Query, Limit/Rows, Offset)
+results, _ := refs.SearchCrossrefWorks("machine learning", 10, 0)
 ```
+
+> [!WARNING]
+> **Tata Cara Penggunaan Limitasi Crossref API**: 
+> - Secara bawaan (*default*), API Crossref membatasi balikan array (seperti pada fungsi *SearchCrossrefWorks*) ke **20 item** apabila Anda memasukkan angka limit `0`.
+> - Batas maksimum (*hard limit*) penarikan data per *request* adalah **1000 item**.
+> - Jika Anda membutuhkan lebih dari 1000 item untuk keperluan analisis data besar (*big data*), gunakan parameter **offset** (pagination) untuk menarik kelanjutan datanya (misal: offset=1000 untuk halaman kedua).
 
 ## Cara Test
 
-Untuk menjalankan pengujian pada package ini, Anda memerlukan API Key dari Scopus. Ikuti langkah-langkah berikut:
+Untuk menjalankan pengujian pada package ini, Anda memerlukan API Key dari Scopus (untuk fungsi Scopus, sementara Crossref dan DOI tidak memerlukan kunci). 
 
 1. **Set Environment Variable `SCOPUS_API_KEY`**
    
@@ -64,7 +94,6 @@ Untuk menjalankan pengujian pada package ini, Anda memerlukan API Key dari Scopu
 Untuk merilis versi terbaru dari package ini, ikuti langkah-langkah Git tag berikut:
 
 1. **Commit dan Push ke Branch Utama**
-   Pastikan semua kode terbaru sudah di-commit dan di-push ke repository.
    ```bash
    git add .
    git commit -m "chore: rilis versi terbaru"
@@ -72,15 +101,12 @@ Untuk merilis versi terbaru dari package ini, ikuti langkah-langkah Git tag beri
    ```
 
 2. **Buat Tag Baru (Otomatis)**
-   Anda bisa membuat tag baru secara otomatis (hanya menaikkan angka terakhir/patch, misal dari `v0.1.0` ke `v0.1.1`) tanpa perlu mengingat versi terakhir:
-
    **Linux / macOS / Git Bash:**
    ```bash
    LATEST_TAG=$(git tag --sort=v:refname | tail -1)
    NEW_TAG=$(echo ${LATEST_TAG:-v0.0.0} | awk -F. -v OFS=. '{$NF++;print}')
    git tag $NEW_TAG
    ```
-
    **Windows (PowerShell):**
    ```powershell
    $latest = git tag --sort=v:refname | Select-Object -Last 1
@@ -92,13 +118,6 @@ Untuk merilis versi terbaru dari package ini, ikuti langkah-langkah Git tag beri
    ```
 
 3. **Push Tag ke Server**
-   Kirim tag yang baru dibuat ke GitHub:
    ```bash
    git push origin --tags
-   ```
-
-4. **Gunakan Versi Terbaru**
-   Setelah tag berhasil di-push, project lain dapat mengunduh dan menggunakan versi tersebut dengan perintah:
-   ```bash
-   go get github.com/ifcoid/refs@v0.1.1
    ```

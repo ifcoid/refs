@@ -1,6 +1,7 @@
 package refs
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -48,9 +49,18 @@ func fetchDOIContent(doi, acceptHeader string) (string, error) {
 	return string(body), nil
 }
 
-// GetDOIMetadataCSLJSON mengembalikan metadata DOI dalam format JSON (CSL-JSON).
-func GetDOIMetadataCSLJSON(doi string) (string, error) {
-	return fetchDOIContent(doi, "application/vnd.citationstyles.csl+json")
+// GetDOIMetadataCSLJSON mengembalikan metadata DOI dalam format JSON (CSL-JSON) yang sudah di-unmarshal ke struct CSLJSON.
+func GetDOIMetadataCSLJSON(doi string) (*CSLJSON, error) {
+	strResp, err := fetchDOIContent(doi, "application/vnd.citationstyles.csl+json")
+	if err != nil {
+		return nil, err
+	}
+
+	var csl CSLJSON
+	if err := json.Unmarshal([]byte(strResp), &csl); err != nil {
+		return nil, fmt.Errorf("gagal unmarshal CSL-JSON: %v", err)
+	}
+	return &csl, nil
 }
 
 // GetDOIBibTeX mengembalikan metadata DOI dalam format BibTeX.

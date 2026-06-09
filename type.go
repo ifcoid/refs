@@ -95,3 +95,111 @@ type CrossrefDate struct {
 	DateParts [][]int `json:"date-parts"`
 	DateTime  string  `json:"date-time"`
 }
+
+// CSLJSON merepresentasikan format metadata standar CSL-JSON
+type CSLJSON struct {
+	Type           string      `json:"type"`
+	Title          string      `json:"title"`
+	Author         []CSLAuthor `json:"author"`
+	Issued         CSLDate     `json:"issued"`
+	Publisher      string      `json:"publisher"`
+	URL            string      `json:"URL"`
+	DOI            string      `json:"DOI"`
+	Volume         string      `json:"volume"`
+	Issue          string      `json:"issue"`
+	Page           string      `json:"page"`
+	ContainerTitle string      `json:"container-title"`
+	Abstract       string      `json:"abstract"`
+}
+
+// CSLAuthor merepresentasikan detail penulis pada CSL-JSON
+type CSLAuthor struct {
+	Family string `json:"family"`
+	Given  string `json:"given"`
+}
+
+// CSLDate merepresentasikan format tanggal pada CSL-JSON
+type CSLDate struct {
+	DateParts [][]int `json:"date-parts"`
+}
+
+// CrossrefSearchResponse menampung hasil query
+type CrossrefSearchResponse struct {
+	Status  string `json:"status"`
+	Message struct {
+		TotalResults int            `json:"total-results"`
+		ItemsPerPage int            `json:"items-per-page"`
+		Items        []CrossrefWork `json:"items"`
+	} `json:"message"`
+}
+
+// CrossrefJournalResponse menampung response jurnal
+type CrossrefJournalResponse struct {
+	Status  string         `json:"status"`
+	Message CrossrefJournal `json:"message"`
+}
+
+// CrossrefJournal menampung profil jurnal
+type CrossrefJournal struct {
+	Title     string   `json:"title"`
+	Publisher string   `json:"publisher"`
+	ISSN      []string `json:"ISSN"`
+}
+
+// CrossrefFunderResponse menampung response funder
+type CrossrefFunderResponse struct {
+	Status  string        `json:"status"`
+	Message CrossrefFunder `json:"message"`
+}
+
+// CrossrefFunder menampung profil penyandang dana
+type CrossrefFunder struct {
+	ID       string   `json:"id"`
+	Location string   `json:"location"`
+	Name     string   `json:"name"`
+	AltNames []string `json:"alt-names"`
+	URI      string   `json:"uri"`
+}
+
+// CrossrefMemberResponse menampung response member/publisher
+type CrossrefMemberResponse struct {
+	Status  string         `json:"status"`
+	Message CrossrefMember `json:"message"`
+}
+
+// CrossrefMember menampung profil institusi/publisher
+type CrossrefMember struct {
+	ID            int      `json:"id"`
+	PrimaryName   string   `json:"primary-name"`
+	Names         []string `json:"names"`
+	Prefixes      []string `json:"prefixes"`
+	Location      string   `json:"location"`
+}
+
+// CrossrefTypeListResponse menampung daftar tipe
+type CrossrefTypeListResponse struct {
+	Status  string `json:"status"`
+	Message struct {
+		Items []CrossrefType `json:"items"`
+	} `json:"message"`
+}
+
+// CrossrefType memuat label tipe publikasi
+type CrossrefType struct {
+	ID    string `json:"id"`
+	Label string `json:"label"`
+}
+
+// CrossrefLicenseListResponse menampung daftar lisensi
+type CrossrefLicenseListResponse struct {
+	Status  string `json:"status"`
+	Message struct {
+		Items []CrossrefLicense `json:"items"`
+	} `json:"message"`
+}
+
+// CrossrefLicense memuat informasi lisensi
+type CrossrefLicense struct {
+	URL       string `json:"URL"`
+	WorkCount int    `json:"work-count"`
+}

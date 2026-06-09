@@ -18,7 +18,7 @@ func TestScopusSearch(t *testing.T) {
 	fmt.Printf("Mencari artikel dengan kata kunci: '%s'\n", query)
 
 	// 1. Proses Pencarian di Scopus
-	searchResult, err := searchScopusArticles(query, apiKey)
+	searchResult, err := SearchScopusArticles(query, apiKey)
 	if err != nil {
 		t.Fatalf("Error searching articles: %v", err)
 	}
@@ -41,7 +41,7 @@ func TestScopusSearch(t *testing.T) {
 	fmt.Printf("DOI   : %s\n", entry.DOI)
 	fmt.Println("--------------------------------------------------")
 
-	fullTextResult, err := retrieveFullText(entry.DOI, apiKey)
+	fullTextResult, err := RetrieveFullText(entry.DOI, apiKey)
 	if err != nil {
 		fmt.Printf("\n[WARNING] Tidak dapat mengambil Full Text: %v\n", err)
 		return

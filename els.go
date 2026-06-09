@@ -8,7 +8,7 @@ import (
 	"net/url"
 )
 
-func searchScopusArticles(query string, apiKey string) (SearchResponse, error) {
+func SearchScopusArticles(query string, apiKey string) (SearchResponse, error) {
 	searchURL := fmt.Sprintf("https://api.elsevier.com/content/search/scopus?query=all(%s)&count=1", url.QueryEscape(query))
 
 	req, err := http.NewRequest("GET", searchURL, nil)
@@ -42,7 +42,7 @@ func searchScopusArticles(query string, apiKey string) (SearchResponse, error) {
 	return searchResult, nil
 }
 
-func retrieveFullText(doi string, apiKey string) (FullTextResponse, error) {
+func RetrieveFullText(doi string, apiKey string) (FullTextResponse, error) {
 	retrieveURL := fmt.Sprintf("https://api.elsevier.com/content/article/doi/%s", doi)
 
 	req, err := http.NewRequest("GET", retrieveURL, nil)

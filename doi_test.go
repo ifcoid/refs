@@ -10,12 +10,15 @@ func TestDOIFetching(t *testing.T) {
 	doi := "10.1109/OJCOMS.2026.3666740"
 
 	t.Run("CSL-JSON", func(t *testing.T) {
-		jsonStr, err := GetDOIMetadataCSLJSON(doi)
+		csl, err := GetDOIMetadataCSLJSON(doi)
 		if err != nil {
 			t.Fatalf("Gagal mengambil CSL-JSON: %v", err)
 		}
-		if !strings.Contains(strings.ToLower(jsonStr), "10.1109\\/ojcoms.2026.3666740") && !strings.Contains(strings.ToLower(jsonStr), "10.1109/ojcoms.2026.3666740") {
-			t.Errorf("JSON tidak mengandung DOI yang diharapkan. Hasil: %s", jsonStr)
+		if csl == nil {
+			t.Fatalf("CSL-JSON nil")
+		}
+		if !strings.EqualFold(csl.DOI, "10.1109/OJCOMS.2026.3666740") {
+			t.Errorf("DOI tidak cocok. Didapat: %s", csl.DOI)
 		}
 	})
 
