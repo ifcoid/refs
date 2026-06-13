@@ -42,6 +42,35 @@ func SearchScopusArticles(query string, apiKey string) (SearchResponse, error) {
 	return searchResult, nil
 }
 
+func RetrieveScopusAbstract(doi string, apiKey string) (*ScopusAbstractResponse, error) {
+	retrieveURL := fmt.Sprintf("https://api.elsevier.com/content/abstract/doi/%s", doi)
+	req, err := http.NewRequest("GET", retrieveURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-ELS-APIKey", apiKey)
+	req.Header.Set("Accept", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("Scopus Abstract API Error (Status: %s). Response: %s", resp.Status, string(body))
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var result ScopusAbstractResponse
+	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, fmt.Errorf("error unmarshaling Scopus Abstract JSON: %v", err)
+	}
+	return &result, nil
+}
+
 func RetrieveFullText(doi string, apiKey string) (FullTextResponse, error) {
 	retrieveURL := fmt.Sprintf("https://api.elsevier.com/content/article/doi/%s", doi)
 

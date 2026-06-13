@@ -53,6 +53,27 @@ type FullTextResponse struct {
 	} `json:"full-text-retrieval-response"`
 }
 
+type ScopusAbstractResponse struct {
+	AbstractsRetrievalResponse struct {
+		AuthKeywords struct {
+			AuthorKeyword []struct {
+				Value string `json:"$"`
+			} `json:"author-keyword"`
+		} `json:"authkeywords"`
+		IdxTerms struct {
+			MainTerm []struct {
+				Value string `json:"$"`
+			} `json:"mainterm"`
+		} `json:"idxterms"`
+		SubjectAreas struct {
+			SubjectArea []struct {
+				Value  string `json:"$"`
+				Abbrev string `json:"@abbrev"`
+			} `json:"subject-area"`
+		} `json:"subject-areas"`
+	} `json:"abstracts-retrieval-response"`
+}
+
 // CrossrefResponse merepresentasikan balikan utama dari API Crossref
 type CrossrefResponse struct {
 	Status  string       `json:"status"`
